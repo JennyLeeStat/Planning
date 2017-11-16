@@ -265,7 +265,7 @@ class PlanningGraph():
         :return:
             builds the graph by filling s_levels[] and a_levels[] lists with node sets for each level
         """
-        # the graph should only be built during class construction
+
         if (len(self.s_levels) != 0) or (len(self.a_levels) != 0):
             raise Exception(
                 'Planning Graph already created; construct a new planning graph for each new state in the planning sequence')
@@ -310,6 +310,10 @@ class PlanningGraph():
         #   set iff all prerequisite literals for the action hold in S0.  This can be accomplished by testing
         #   to see if a proposed PgNode_a has prenodes that are a subset of the previous S level.  Once an
         #   action node is added, it MUST be connected to the S node instances in the appropriate s_level set.
+
+
+
+
 
     def add_literal_level(self, level):
         """ add an S (literal) level to the Planning Graph
@@ -386,6 +390,16 @@ class PlanningGraph():
         :return: bool
         """
         # TODO test for Inconsistent Effects between nodes
+        for effect_1 in node_a1.action.effect_add:
+            for effect_2 in node_a2.action.effect_rem:
+                if effect_1 == effect_2:
+                    return True
+
+        for effect_1 in node_a1.action.effect_rem:
+            for effect_2 in node_a2.action.effect_add:
+                if effect_1 == effect_2:
+                    return True
+
         return False
 
     def interference_mutex(self, node_a1: PgNode_a, node_a2: PgNode_a) -> bool:

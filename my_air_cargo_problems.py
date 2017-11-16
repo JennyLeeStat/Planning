@@ -59,10 +59,10 @@ class AirCargoProblem(Problem):
                 for plane in self.planes:
                     for cargo in self.cargos:
                         precond_pos = [ expr("At({}, {})".format(cargo, airport)),
-                                        expr("At({}, {})".format(plane, airport)), ]
-                        precond_neg = [ expr("In({}, {})".format(cargo, plane))]
+                                        expr("At({}, {})".format(plane, airport))]
+                        precond_neg = [ ]
                         effect_add = [ expr("In({}, {})".format(cargo, plane)) ]
-                        effect_rem = [ expr("At({}, {})".format(cargo, airport)), ]
+                        effect_rem = [ expr("At({}, {})".format(cargo, airport))]
                         load = Action(expr("Load({}, {}, {})".format(cargo, plane, airport)),
                                         [ precond_pos, precond_neg ],
                                         [ effect_add, effect_rem ])
@@ -145,10 +145,20 @@ class AirCargoProblem(Problem):
         :param action: Action applied
         :return: resulting state after action
         """
-        # TODO implement
+
+        current_state = decode_state(state, self.state_map)
         new_state = FluentState([], [])
+
+        for pos in current_state.pos:
+            if pos not in action.effect_rem:
+                new_state.pos.append(pos)
+
         for add_effect in action.effect_add:
             new_state.pos.append(add_effect)
+
+        for neg in current_state.neg:
+            if neg not in action.effect_add:
+                new_state.neg.append(neg)
 
         for rm_effect in action.effect_rem:
             new_state.neg.append(rm_effect)
@@ -192,8 +202,12 @@ class AirCargoProblem(Problem):
         conditions by ignoring the preconditions required for an action to be
         executed.
         """
-        # TODO implement (see Russell-Norvig Ed-3 10.2.3  or Russell-Norvig Ed-2 11.2)
+        current_state = decode_state(node.state, self.state_map).pos
         count = 0
+        for g in self.goal:
+            if g not in current_state:
+                count += 1
+
         return count
 
 
