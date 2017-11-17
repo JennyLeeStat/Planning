@@ -553,15 +553,19 @@ class PlanningGraph():
         :return: int
         """
         level_sum = 0
+        goals = self.problem.goal.copy()
 
-        goals = self.problem.goal
         while len(goals) > 0:
             for level in range(len(self.s_levels)):
-                symbols = [ list(self.s_levels[ level ])[ i ].symbol \
-                            for i, _ in enumerate(self.s_levels[ level ]) ]
+                symbols = [ state.symbol \
+                            for i, state in enumerate(self.s_levels[ level ]) \
+                            if state.is_pos]
+                # print("goal: {}".format(goals))
+                # print("symbols: {}".format(symbols))
                 for goal in goals:
                     if goal in symbols:
                         level_sum += level
+                        # print("total cost: {}".format(level_sum))
                         goals.remove(goal)
 
 
