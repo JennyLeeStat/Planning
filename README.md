@@ -1,43 +1,13 @@
 
-# Implement a Planning Search
+This project solves deterministic logistics planning problems
+for an Air Cargo transportation. We construct a compact data
+structure called planning graph. Then with compare the performance
+of Forward state-space search algorithms for different heuristics.
 
-## Synopsis
+This was submitted as part of the completion for [Udacity’s Artificial Intelligence Nanodegree program](https://github.com/udacity/AIND-Planning)
 
-This project includes skeletons for the classes and functions needed to solve deterministic logistics planning problems for an Air Cargo transport system using a planning search agent. 
-With progression search algorithms like those in the navigation problem from lecture, optimal plans for each 
-problem will be computed.  Unlike the navigation problem, there is no simple distance heuristic to aid the agent. 
-Instead, you will implement domain-independent heuristics.
-![Progression air cargo search](images/Progression.PNG)
+# Three air cargo transportation problem
 
-- Part 1 - Planning problems:
-	- READ: applicable portions of the Russel/Norvig AIMA text
-	- GIVEN: problems defined in classical PDDL (Planning Domain Definition Language)
-	- TODO: Implement the Python methods and functions as marked in `my_air_cargo_problems.py`
-	- TODO: Experiment and document metrics
-- Part 2 - Domain-independent heuristics:
-	- READ: applicable portions of the Russel/Norvig AIMA text
-	- TODO: Implement relaxed problem heuristic in `my_air_cargo_problems.py`
-	- TODO: Implement Planning Graph and automatic heuristic in `my_planning_graph.py`
-	- TODO: Experiment and document metrics
-- Part 3 - Written Analysis
-
-## Environment requirements
-- Python 3.4 or higher
-- Starter code includes a copy of [companion code](https://github.com/aimacode) from the Stuart Russel/Norvig AIMA text.  
-
-
-## Project Details
-### Part 1 - Planning problems
-#### READ: Stuart Russel and Peter Norvig text:
-
-"Artificial Intelligence: A Modern Approach" 3rd edition chapter 10 *or* 2nd edition Chapter 11 on Planning, available [on the AIMA book site](http://aima.cs.berkeley.edu/2nd-ed/newchap11.pdf) sections: 
-
-- *The Planning Problem*
-- *Planning with State-space Search*
-
-#### GIVEN: classical PDDL problems
-
-All problems are in the Air Cargo domain.  They have the same action schema defined, but different initial states and goals.
 
 - Air Cargo Action Schema:
 ```
@@ -54,17 +24,17 @@ Action(Fly(p, from, to),
 
 - Problem 1 initial state and goal:
 ```
-Init(At(C1, SFO) ∧ At(C2, JFK) 
-	∧ At(P1, SFO) ∧ At(P2, JFK) 
-	∧ Cargo(C1) ∧ Cargo(C2) 
+Init(At(C1, SFO) ∧ At(C2, JFK)
+	∧ At(P1, SFO) ∧ At(P2, JFK)
+	∧ Cargo(C1) ∧ Cargo(C2)
 	∧ Plane(P1) ∧ Plane(P2)
 	∧ Airport(JFK) ∧ Airport(SFO))
 Goal(At(C1, JFK) ∧ At(C2, SFO))
 ```
 - Problem 2 initial state and goal:
 ```
-Init(At(C1, SFO) ∧ At(C2, JFK) ∧ At(C3, ATL) 
-	∧ At(P1, SFO) ∧ At(P2, JFK) ∧ At(P3, ATL) 
+Init(At(C1, SFO) ∧ At(C2, JFK) ∧ At(C3, ATL)
+	∧ At(P1, SFO) ∧ At(P2, JFK) ∧ At(P3, ATL)
 	∧ Cargo(C1) ∧ Cargo(C2) ∧ Cargo(C3)
 	∧ Plane(P1) ∧ Plane(P2) ∧ Plane(P3)
 	∧ Airport(JFK) ∧ Airport(SFO) ∧ Airport(ATL))
@@ -72,104 +42,169 @@ Goal(At(C1, JFK) ∧ At(C2, SFO) ∧ At(C3, SFO))
 ```
 - Problem 3 initial state and goal:
 ```
-Init(At(C1, SFO) ∧ At(C2, JFK) ∧ At(C3, ATL) ∧ At(C4, ORD) 
-	∧ At(P1, SFO) ∧ At(P2, JFK) 
+Init(At(C1, SFO) ∧ At(C2, JFK) ∧ At(C3, ATL) ∧ At(C4, ORD)
+	∧ At(P1, SFO) ∧ At(P2, JFK)
 	∧ Cargo(C1) ∧ Cargo(C2) ∧ Cargo(C3) ∧ Cargo(C4)
 	∧ Plane(P1) ∧ Plane(P2)
 	∧ Airport(JFK) ∧ Airport(SFO) ∧ Airport(ATL) ∧ Airport(ORD))
 Goal(At(C1, JFK) ∧ At(C3, JFK) ∧ At(C2, SFO) ∧ At(C4, SFO))
 ```
 
-#### TODO: Implement methods and functions in `my_air_cargo_problems.py`
-- `AirCargoProblem.get_actions` method including `load_actions` and `unload_actions` sub-functions
-- `AirCargoProblem.actions` method
-- `AirCargoProblem.result` method
-- `air_cargo_p2` function
-- `air_cargo_p3` function
+# Planning with state-space search with heuristics
 
-#### TODO: Experiment and document metrics for non-heuristic planning solution searches
-* Run uninformed planning searches for `air_cargo_p1`, `air_cargo_p2`, and `air_cargo_p3`; provide metrics on number of node expansions required, number of goal tests, time elapsed, and optimality of solution for each search algorithm. Include the result of at least three of these searches, including breadth-first and depth-first, in your write-up (`breadth_first_search` and `depth_first_graph_search`). 
-* If depth-first takes longer than 10 minutes for Problem 3 on your system, stop the search and provide this information in your report.
-* Use the `run_search` script for your data collection: from the command line type `python run_search.py -h` to learn more.
+1) Ignore preconditions heuristics
 
->#### Why are we setting the problems up this way?  
->Progression planning problems can be 
-solved with graph searches such as breadth-first, depth-first, and A*, where the 
-nodes of the graph are "states" and edges are "actions".  A "state" is the logical 
-conjunction of all boolean ground "fluents", or state variables, that are possible 
-for the problem using Propositional Logic. For example, we might have a problem to 
-plan the transport of one cargo, C1, on a
-single available plane, P1, from one airport to another, SFO to JFK.
-![state space](images/statespace.png)
-In this simple example, there are five fluents, or state variables, which means our state 
-space could be as large as ![2to5](images/twotofive.png). Note the following:
->- While the initial state defines every fluent explicitly, in this case mapped to **TTFFF**, the goal may 
-be a set of states.  Any state that is `True` for the fluent `At(C1,JFK)` meets the goal.
->- Even though PDDL uses variable to describe actions as "action schema", these problems
-are not solved with First Order Logic.  They are solved with Propositional logic and must
-therefore be defined with concrete (non-variable) actions
-and literal (non-variable) fluents in state descriptions.
->- The fluents here are mapped to a simple string representing the boolean value of each fluent
-in the system, e.g. **TTFFTT...TTF**.  This will be the state representation in 
-the `AirCargoProblem` class and is compatible with the `Node` and `Problem` 
-classes, and the search methods in the AIMA library.  
+Let’s first consider the approach adding edges to the graph.
+To relax the problem, we ignore all preconditions for each action
+ and all literals except those in the goals.
+ With these assumptions, every action is executable in all states
+ and any single goal can be attained by a single step.
+ This heuristic computes the minimum number of steps required to
+ so that the union of effects of actions can achieve the goals.
+ For our case, it’s equivalent to counting the number of
+ unsatisfied goals.
+
+2) level sum heuristics
+
+Once constructed a planning graph, we can estimate the cost
+of achieving any goal literals
+$g_i$ as the level a which
+$g_i$ first appears in the planning graph from the initial state.
+ This is called the level sum.
+
+We implement the level sum heuristic, sum of the level costs of
+ the goals. This heuristic is inadmissible, but works well in
+ practice.
 
 
-### Part 2 - Domain-independent heuristics
-#### READ: Stuart Russel and Peter Norvig text
-"Artificial Intelligence: A Modern Approach" 3rd edition chapter 10 *or* 2nd edition Chapter 11 on Planning, available [on the AIMA book site](http://aima.cs.berkeley.edu/2nd-ed/newchap11.pdf) section: 
+# Search result
+### Problem 1
 
-- *Planning Graph*
+To achieve the goal of the first problem, it is required
+to move the cargo 1 from SFO to JFK, and cargo 2 from JFK to SFO.
+The optimal solution has a sequence of six actions that loading each cargo
+to the planes at each airport (2), flying both planes to the other airports (2)
+and unloading the cargo (2).
+An example of optimal solution is
+\[Load(C2, P2, JFK), Load(C1, P1, SFO), Fly(P2, JFK, SFO),
+Unload(C2, P2, SFO), Fly(P1, SFO, JFK), Unload(C1, P1, JFK)].
 
-#### TODO: Implement heuristic method in `my_air_cargo_problems.py`
-- `AirCargoProblem.h_ignore_preconditions` method
+##### Comparison of uninformed search for three problems
+Maybe because this problem is relatively small, uninformed search algorithms
+could find the optimal planning solution in fairly short time.
+ Though the depth first graph search algorithm and depth limited search
+ algorithm explored smaller number of new nodes and used less data
+ storage in shorter runtime, the solution they found were not optimal,
+ including redundant actions. This is because the search is not complete.
+ Among the search algorithms that found optimal planning solution,
+ the breadth first search performed best.
 
-#### TODO: Implement a Planning Graph with automatic heuristics in `my_planning_graph.py`
-- `PlanningGraph.add_action_level` method
-- `PlanningGraph.add_literal_level` method
-- `PlanningGraph.inconsistent_effects_mutex` method
-- `PlanningGraph.interference_mutex` method
-- `PlanningGraph.competing_needs_mutex` method
-- `PlanningGraph.negation_mutex` method
-- `PlanningGraph.inconsistent_support_mutex` method
-- `PlanningGraph.h_levelsum` method
+| Algorithm | Expansions | New nodes | Time elapsed (sec) | Plan length | Optimality |
+|-----------|-----------|-----------|--------------------|-------------|------------|
+|BFS | 43 | 180 | 0.1745 | 6 | Optimal|
+|BFTS | 1,458 | 5,960 | 6.0689 | 6 | optimal|
+|DFGS | 12 | 48 | 0.0525 | 12 | Not optimal|
+| Depth limited | 101 | 414 | 0.4362 | 50 | Not optimal|
+
+##### Comparison of heuristics of A* search
+All heuristics found the optimal solution.
+The A* with h_pg_levelsum expanded smallest number of nodes,
+though it took the longest time to run.
+The h_ignore_preconditions reached goal state faster than
+other two heuristics. Though the performance results of uninformed search
+and heuristic search were quite similar for this small problem, T
+he A* with h_ignore_preconditions performed slightly better than other search algorithms.
 
 
-#### TODO: Experiment and document: metrics of A* searches with these heuristics
-* Run A* planning searches using the heuristics you have implemented on `air_cargo_p1`, `air_cargo_p2` and `air_cargo_p3`. Provide metrics on number of node expansions required, number of goal tests, time elapsed, and optimality of solution for each search algorithm and include the results in your report. 
-* Use the `run_search` script for this purpose: from the command line type `python run_search.py -h` to learn more.
+| Algorithm | Expansions | New nodes | Time elapsed (sec) | Plan length | Optimality |
+|-----------|-----------|-----------|--------------------|-------------|------------|
+|A* with h_1| 55 | 224| 0.2438 |6| Optimal|
+|A* with h_ignore_preconditions|41 |170| 0.1670| 6 |Optimal|
+|A* with h_pg_levelsum |32 | 148 |1.3353 |6| Optimal|
 
->#### Why a Planning Graph?
->The planning graph is somewhat complex, but is useful in planning because it is a polynomial-size approximation of the exponential tree that represents all possible paths. The planning graph can be used to provide automated admissible heuristics for any domain.  It can also be used as the first step in implementing GRAPHPLAN, a direct planning algorithm that you may wish to learn more about on your own (but we will not address it here).
 
->*Planning Graph example from the AIMA book*
->![Planning Graph](images/eatcake-graphplan2.png)
+# Problem 2
+For this problem, additional cargo, plane, and airport are introduced.
+Initially, the cargo 1 and plane 1 are at SFO; the cargo 2 and plane 2 are at JFK;
+ and the cargo 3 and plane 3 are at ATL. At the goal state of the problem,
+ the cargo 1 is at JFK, and cargo 2 and cargo 3 at ATL.
+ Note that the goal state does not count where the planes end up.
+ The optimal planning solution in this case consists of a sequence of 9 actions,
+ loading the cargo at each airport (3), flying the planes to the desired airports(3),
+ then unloading the cargos (3). An example of optimal planning is
+ \[Load(C2, P2, JFK), Load(C1, P1, SFO), Load(C3, P3, ATL), Fly(P2, JFK, SFO),
+ Unload(C2, P2, SFO), Fly(P1, SFO, JFK), Unload(C1, P1, JFK), Fly(P3, ATL, SFO),
+ Unload(C3, P3, SFO)].
 
-### Part 3: Written Analysis
-#### TODO: Include the following in your written analysis.  
-- Provide an optimal plan for Problems 1, 2, and 3.
-- Compare and contrast non-heuristic search result metrics (optimality, time elapsed, number of node expansions) for Problems 1,2, and 3. Include breadth-first, depth-first, and at least one other uninformed non-heuristic search in your comparison; Your third choice of non-heuristic search may be skipped for Problem 3 if it takes longer than 10 minutes to run, but a note in this case should be included.
-- Compare and contrast heuristic search result metrics using A* with the "ignore preconditions" and "level-sum" heuristics for Problems 1, 2, and 3.
-- What was the best heuristic used in these problems?  Was it better than non-heuristic search planning methods for all problems?  Why or why not?
-- Provide tables or other visual aids as needed for clarity in your discussion.
+##### Comparison of uninformed search for three problems
+Similar to problem 1, depth first graph search could find the solution quickly
+and opened less nodes, but the solution found was not optimal.
+Depth limited tree search also returned a nonoptimal solution after
+expanding so many nodes. Breadth first tree search took more than reasonable time
+ to find the solution in the local environment.
+ I suspect this is because, unlike the graph search,
+  the breadth first tree search does not exclude reversing to the previous state.
+  For example, for tree search, repeating loading a cargo to a plane and unloading
+  the same cargo right after is considered as executable actions.
+Among the uninformed search algorithms, the BFS performed the best.
+ It returned the optimal solution fast, expanding less number of nodes.
 
-## Examples and Testing:
-- The planning problem for the "Have Cake and Eat it Too" problem in the book has been
-implemented in the `example_have_cake` module as an example.
-- The `tests` directory includes `unittest` test cases to evaluate your implementations. All tests should pass before you submit your project for review. From the AIND-Planning directory command line:
-    - `python -m unittest tests.test_my_air_cargo_problems`
-    - `python -m unittest tests.test_my_planning_graph`
-- The `run_search` script is provided for gathering metrics for various search methods on any or all of the problems and should be used for this purpose.
+| Algorithm | Expansions | New nodes | Time elapsed (sec) | Plan length | Optimality |
+|-----------|----------- |-----------|--------------------|-------------|------------|
+|BFS | 3,343 | 30,509 |65.8927 |9| Optimal|
+|BFTS |- | -          |>10min  | - |-      |
+|DFGS | 582| 5,211| 14.5242| 575| Not optimal
+| Depth limited | 222,719 | 2,054,119| 4797.7268 |50| Not optimal|
 
-## Submission
-Before submitting your solution to a reviewer, you are required to submit your project to Udacity's Project Assistant, which will provide some initial feedback.  
 
-The setup is simple.  If you have not installed the client tool already, then you may do so with the command `pip install udacity-pa`.  
+##### Comparison of heuristics of A* search
+Again, all heuristics found the optimal solution.
+The h_pg_levelsum heuristic expanded significantly less number of new nodes,
+ though it spent more time than other two.
+ Depending on the user’s need for storage and runtime,
+ the decision for the best heuristics could be different.
+ If finding solution in quick runtime is important,
+ then A* with h_ignore_preconditions is better, vice versa.
 
-To submit your code to the project assistant, run `udacity submit` from within the top-level directory of this project.  You will be prompted for a username and password.  If you login using google or facebook, visit [this link](https://project-assistant.udacity.com/auth_tokens/jwt_login) for alternate login instructions.
+| Algorithm | Expansions | New nodes | Time elapsed (sec) | Plan length | Optimality |
+|-----------|-----------|----------- |--------------------|-------------|------------|
+|A* with h_1| 4,853     |44,041      |80.8756             | 9 |Optimal|
+|A* with h_ignore_preconditions|1,450 | 13,303 |24.0998 |9| Optimal|
+|A* with h_pg_levelsum |168| 1,618| 110.4581| 9| Optimal|
 
-This process will create a zipfile in your top-level directory named cargo_planning-<id>.zip.  This is the file that you should submit to the Udacity reviews system.
 
-## Improving Execution Time
+### Problem 3
+In this case, a total of four cargos are located at four
+different airports and only two planes are available.
+ Optimal planning solution has a sequence of 12 actions.
+ One example of optimal solution is \[Load(C1, P1, SFO), Fly(P1, SFO, ATL), Load(C3, P1, ATL), Fly(P1, ATL, JFK), Load(C2, P1, JFK), Unload(C1, P1, JFK), Unload(C3, P1, JFK), Fly(P1, JFK, ORD), Load(C4, P1, ORD), Fly(P1, ORD, SFO), Unload(C2, P1, SFO), Unload(C4, P1, SFO)].
 
-The exercises in this project can take a *long* time to run (from several seconds to a several hours) depending on the heuristics and search algorithms you choose, as well as the efficiency of your own code.  (You may want to stop and profile your code if runtimes stretch past a few minutes.) One option to improve execution time is to try installing and using [pypy3](http://pypy.org/download.html) -- a python JIT, which can accelerate execution time substantially.  Using pypy is *not* required (and thus not officially supported) -- an efficient solution to this project runs in very reasonable time on modest hardware -- but working with pypy may allow students to explore more sophisticated problems than the examples included in the project.
+
+
+##### Comparison of uninformed search for three problems
+
+The breadth first tree search and depth limited search could not find the solution in a reasonable time. Similar to the two previous problems, the solution found by depth first tree search was not optimal. Among the algorithms that found the optimal solution, BFS performed better. It was faster to run and opened less new nodes.
+
+| Algorithm | Expansions | New nodes | Time elapsed (sec) | Plan length | Optimality |
+|-----------|----------- |-----------|--------------------|-------------|------------|
+|BFS | 9,456 11,993 71,407 216.992472 12 Optimal
+|BFTS |- | -          |>10min  | - |-      |
+|DFGS | 832 | 3,692 |17.4152 |662 |Not optimal|
+| Depth limited |- | -          |>10min  | - |-      |
+
+##### Comparison of heuristics of A* search
+
+A* with h_pg_levelsum heuristic took more than 10 minutes to run in the local system. A* with h_ignore_preconditions could find the solution very fast, however, the solution found was not optimal.
+
+| Algorithm | Expansions | New nodes | Time elapsed (sec) | Plan length | Optimality |
+|-----------|-----------|----------- |--------------------|-------------|------------|
+|A* with h_1| 11,804    |88,393      |228.3863 |12 |Optimal|
+|A* with h_ignore_preconditions|4,643 |36,113 |90.2555 |13| Not Optimal|
+|A* with h_pg_levelsum |- |-| > 10m |-| -|
+
+
+
+
+# Reference
+- Artificial Intelligence: A Modern Approach, 3rd Ed, S. Russel and P. Norvig (2010)
+- [MIT OpenCourseWare lecture on GraphPlan and making planning graphs](https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-825-techniques-in-artificial-intelligence-sma-5504-fall-2002/lecture-notes/Lecture12FinalPart1.pdf)
