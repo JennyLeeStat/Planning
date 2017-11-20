@@ -7,7 +7,7 @@ of Forward state-space search algorithms with different heuristics.
 This project was submitted as part of the completion for
  [Udacity’s Artificial Intelligence Nanodegree program](https://github.com/udacity/AIND-Planning)
 
-# Three air cargo transportation problem
+# Three air cargo transportation problems
 
 
 - Air Cargo Action Schema:
@@ -188,8 +188,8 @@ The breadth first tree search and depth limited search could not find the soluti
 
 | Algorithm | Expansions | New nodes | Time elapsed (sec) | Plan length | Optimality |
 |-----------|----------- |-----------|--------------------|-------------|------------|
-|BFS | 9,456 11,993 71,407 216.992472 12 Optimal
-|BFTS |- | -          |>10min  | - |-      |
+|BFS        |  9,456     |    71,407 |216.99247           | 12          |Optimal
+|BFTS       |- | -          |>10min  | - |-      |
 |DFGS | 832 | 3,692 |17.4152 |662 |Not optimal|
 | Depth limited |- | -          |>10min  | - |-      |
 
