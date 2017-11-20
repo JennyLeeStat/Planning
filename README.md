@@ -1,10 +1,11 @@
 
 This project solves deterministic logistics planning problems
-for an Air Cargo transportation. We construct a compact data
-structure called planning graph. Then with compare the performance
-of Forward state-space search algorithms for different heuristics.
+for an Air Cargo transportation. We first construct a compact data
+structure called planning graph, then compare the performance
+of Forward state-space search algorithms with different heuristics.
 
-This was submitted as part of the completion for [Udacity’s Artificial Intelligence Nanodegree program](https://github.com/udacity/AIND-Planning)
+This project was submitted as part of the completion for
+ [Udacity’s Artificial Intelligence Nanodegree program](https://github.com/udacity/AIND-Planning)
 
 # Three air cargo transportation problem
 
